@@ -1,1 +1,58 @@
-tuning/transducer/train_conformer-rnn_transducer.yaml
+# minibatch related
+batch-size: 10
+maxlen-in: 800
+maxlen-out: 150
+
+# transducer related
+model-module: "espnet.nets.pytorch_backend.e2e_asr_transducer_for_tt:E2E"
+
+# optimization related
+criterion: loss
+early-stop-criterion: "validation/main/loss"
+sortagrad: 0
+opt: noam
+transformer-lr: 10.0
+transformer-warmup-steps: 8000
+epochs: 30
+patience: 0
+accum-grad: 4
+grad-clip: 5.0
+
+# network architecture
+## general
+## encoder related
+custom-enc-input-layer: linear
+custom-enc-positional-encoding-type: rel_pos
+custom-enc-self-attn-type: rel_self_attn
+etype: custom
+enc-block-arch:
+        - type: transformer
+          d_hidden: 256
+          d_ff_1: 512
+          d_ff_2: 256
+          heads: 4
+          head_dim: 256
+          normalize_before: True
+          concat_after: True
+          att-dropout-rate: 0.4
+          dropout-rate: 0.1
+enc-block-repeat: 8
+## decoder related
+custom-dec-input-layer: embed
+custom-dec-positional-encoding-type: rel_pos
+custom-dec-self-attn-type: rel_self_attn
+dtype: custom
+dec-block-arch:
+        - type: transformer
+          d_hidden: 256
+          d_ff_1: 512
+          d_ff_2: 256
+          heads: 4
+          head_dim: 256
+          normalize_before: True
+          concat_after: True
+          att-dropout-rate: 0.1
+          dropout-rate: 0.1
+dec-block-repeat: 2
+## joint network related
+joint-dim: 128
